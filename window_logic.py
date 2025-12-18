@@ -6,19 +6,18 @@ import math, numpy as np
 
 class Config:
     #universal values
-    #constants
-    G = 6.67*10**-11
-    R = 8.31
-    Eta = 8.854*10**-12
-    
+    stream_url = None
+    threshold_value = 0.05   # threshold for change detection
     #config values
-    fps = 60
-    side = 600
+    fps = 30
+    delay = 1 / (5*fps)   # camera read delay to reduce CPU usage
+    side_x = 640
+    side_y = 480
 
 class Logic:
     def outPut(self, input):
         output = np.array((
             [input, input]
         ))
-        print('im doing something')
+        #print('im doing something')
         return output
