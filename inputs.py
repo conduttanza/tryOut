@@ -12,7 +12,7 @@ class Image:
     
     def __init__(self):
         self.stream_url = Config.stream_url
-        self.cap = cv2.VideoCapture(self.stream_url or 0, cv2.CAP_ANY)  # 0 = default camera
+        self.cap = cv2.VideoCapture(self.stream_url or 0, cv2.CAP_DSHOW)  # 0 = default camera
         if not self.cap.isOpened():
             raise RuntimeError("Cannot use camera")
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, Config.side_x)

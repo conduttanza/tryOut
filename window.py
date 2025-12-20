@@ -23,7 +23,7 @@ center = np.array((
 ))
 
 pygame.init()
-pygame.display.set_caption('project x')
+pygame.display.set_caption('hand simulation')
 screen = pygame.display.set_mode((side_x, side_y), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 
@@ -32,7 +32,8 @@ def Point(input):
     return coords
 
 running = True
-
+I_finger = None
+Thumb = None
 try:
     while running:
         for event in pygame.event.get():
@@ -41,17 +42,25 @@ try:
                 print('quitting...')
             
         screen.fill((0,0,0))
-        
+        '''
         #webcam stream
         image.show_stream(screen)
         frame = image.get_frame()
         if frame is not None:
             recognition.process_frame(frame)
-        #future drawings here
+        '''
+        #hand recon
         
-        #point = Point(1)
-        #pygame.draw.circle(
-            #screen,(255,255,255), point+center, 10)
+        recognition.handRecognition()
+        
+        if I_finger is not None and Thumb is not None:
+            ix = int(I_finger.x * side_x)
+            iy = int(I_finger.y * side_y)
+
+            tx = int(Thumb.x * side_x)
+            ty = int(Thumb.y * side_y)
+            #future drawings here
+            pygame.draw.line(screen, (0,255,0), (ix, iy), (tx, ty), 3)
         
         clock.tick(fps)
         pygame.display.flip()

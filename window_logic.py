@@ -7,7 +7,7 @@ import math, numpy as np
 class Config:
     #universal values
     stream_url = None
-    threshold_value = 0.05   # threshold for change detection
+    threshold_value = 0.01   # threshold for change detection
     #config values
     fps = 30
     delay = 1 / (5*fps)   # camera read delay to reduce CPU usage
