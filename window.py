@@ -13,9 +13,9 @@ code = window_logic.Logic()
 fps = config.fps
 side_x = config.side_x
 side_y = config.side_y
-image = inputs.Image()
+image = inputs
 recognition = imagRec_logic
-
+recognizer = recognition.Hands_Reckon()
 
 
 center = np.array((
@@ -32,8 +32,7 @@ def Point(input):
     return coords
 
 running = True
-I_finger = None
-Thumb = None
+
 try:
     while running:
         for event in pygame.event.get():
@@ -42,26 +41,32 @@ try:
                 print('quitting...')
             
         screen.fill((0,0,0))
-        '''
+        
         #webcam stream
-        image.show_stream(screen)
-        frame = image.get_frame()
-        if frame is not None:
-            recognition.process_frame(frame)
-        '''
+        #image.Image.show_stream(screen)
+        #frame = image.Image.get_frame()
+        #if frame is not None:
+            #recognition.process_frame(frame)
+        
         #hand recon
         
-        recognition.handRecognition()
-        
-        if I_finger is not None and Thumb is not None:
-            ix = int(I_finger.x * side_x)
-            iy = int(I_finger.y * side_y)
-
-            tx = int(Thumb.x * side_x)
-            ty = int(Thumb.y * side_y)
-            #future drawings here
-            pygame.draw.line(screen, (0,255,0), (ix, iy), (tx, ty), 3)
-        
+        recognizer.show_recon()
+        landmarks = recognizer.returnLandmarks()
+        if landmarks:
+            
+            Thumb = landmarks.landmark[4]
+            #print(Thumb)
+            tx = config.side_x - int(Thumb.x * config.side_x)
+            ty = int(Thumb.y * config.side_y)
+            
+            I_finger = landmarks.landmark[8]
+            #print(Thumb)
+            ix = config.side_x - int(I_finger.x * config.side_x)
+            iy = int(I_finger.y * config.side_y)
+            
+            pygame.draw.circle(screen,(0,255,0),(tx, ty), 10)
+            pygame.draw.circle(screen,(0,255,0),(ix, iy), 10)
+            pygame.draw.line(screen,(0,255,0),(ix,iy),(tx, ty), 3)
         clock.tick(fps)
         pygame.display.flip()
         if running == False:

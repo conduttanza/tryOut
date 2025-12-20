@@ -2,9 +2,9 @@
 #
 #created the 17/12/2025
 import cv2, pygame, time
-from threading import Thread    
+from threading import Thread, Lock
 from window_logic import Config
-from threading import Lock
+
 
 
 
@@ -27,7 +27,7 @@ class Image:
         try:
             while self.running:
                 ret, frame = self.cap.read()
-                time.sleep(Config.delay)    # to reduce CPU usage
+                #time.sleep(Config.delay)    # to reduce CPU usage
                 if ret:
                     with self.lock:
                         self.ret = ret

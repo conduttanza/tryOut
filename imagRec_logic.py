@@ -5,6 +5,7 @@
 #simple torch based change detection for image recognition
 import torch
 import time
+from threading import Thread, Lock
 #hand recognition imports
 #
 #using the mediapipe library 
@@ -14,6 +15,7 @@ import mediapipe as mp
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
+    
 
 #self made imports
 from window_logic import Config
@@ -21,12 +23,72 @@ from inputs import Image
 image = Image()
 # Module-level state for change detection
 
+class Hands_Reckon:
+    
+    def __init__(self):
+        #time.sleep(Config.delay)
+        self.stream_url = Config.stream_url
+        self.cap = cv2.VideoCapture(self.stream_url or 0, cv2.CAP_DSHOW)
+        if not self.cap.isOpened():
+            raise RuntimeError("Cannot use camera")
+        self.hand_landmarks = None
+        self.ret = False
+        self.frame = None
+        self.running = True
+        self.lock = Lock
+        Thread(target=self.update, daemon=True).start()
+        
+    def update(self):
+        with mp_hands.Hands(
+            model_complexity = 0, 
+            min_detection_confidence = 0.5,
+            min_tracking_confidence = 0.5) as hands:
+            while self.cap.isOpened() and self.running:
+                ret, frame = self.cap.read()
+                if not ret:
+                    time.sleep(Config.delay)
+                    print('Empty frame', '\n', 'skipping...')
+                    continue
+                frame.flags.writeable = False #improved performance
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                results = hands.process(frame)
+                if results.multi_hand_landmarks:
+                    #print('existent results')
+                    for hand_landmarks in results.multi_hand_landmarks:
+                        mp_drawing.draw_landmarks(
+                        frame,
+                        hand_landmarks,
+                        mp_hands.HAND_CONNECTIONS,
+                        mp_drawing_styles.get_default_hand_landmarks_style(),
+                        mp_drawing_styles.get_default_hand_connections_style()
+                    )
+                    self.hand_landmarks = hand_landmarks
+                    
+                self.ret = True
+                self.frame = frame.copy()
+                #print('line 64 done')
+                #time.sleep(Config.delay)
+                #print('imshow done')
+    
+    def show_recon(self):
+        if not self.ret:
+            return
+        frame_rgb = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+        cv2.imshow('tracker', cv2.flip(frame_rgb, 1))
+        
+    def returnLandmarks(self):
+        #print('sending landmarks')
+        return self.hand_landmarks if self.ret else None
+    
+    def stop(self):
+        self.running = False
+        self.cap.release()
+        cv2.destroyAllWindows()
+'''
 
-
+    
 def handRecognition():
     #time.sleep(Config.delay) 
-    I_finger = None
-    Thumb = None
     
     cap = cv2.VideoCapture(Config.stream_url or 0)
     with mp_hands.Hands(
@@ -42,12 +104,12 @@ def handRecognition():
             # To de-improve performance, optionally mark the image as writeable to
             # pass by reference.
             # 
-            '''
+            
             
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame.flags.writeable = True
             
-            '''
+            
             frame.flags.writeable = False
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
@@ -70,6 +132,9 @@ def handRecognition():
                 break
         cap.release()
         cv2.destroyAllWindows()
+
+
+'''
 
 
 old_frame = None
