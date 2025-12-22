@@ -3,7 +3,7 @@
 #created the 17/12/2025
 
 #universal imports
-import pygame, numpy as np, cv2
+import pygame, numpy as np, cv2, math
 
 #self made imports
 import window_logic, inputs, imagRec_logic
@@ -16,7 +16,6 @@ side_y = config.side_y
 image = inputs
 recognition = imagRec_logic
 recognizer = recognition.Hands_Reckon()
-
 
 center = np.array((
     [side_x/2, side_y/2]
@@ -32,6 +31,7 @@ def Point(input):
     return coords
 
 running = True
+R = G = B = 255
 
 try:
     while running:
@@ -52,21 +52,80 @@ try:
         
         recognizer.show_recon()
         landmarks = recognizer.returnLandmarks()
+        
+        #xtremes of the hand
         if landmarks:
             
             Thumb = landmarks.landmark[4]
             #print(Thumb)
-            tx = config.side_x - int(Thumb.x * config.side_x)
-            ty = int(Thumb.y * config.side_y)
+            tx = side_x - int(Thumb.x * side_x)
+            ty = int(Thumb.y * side_y)
+            tz = Thumb.z * side_x
             
             I_finger = landmarks.landmark[8]
-            #print(Thumb)
-            ix = config.side_x - int(I_finger.x * config.side_x)
-            iy = int(I_finger.y * config.side_y)
+            #print(I_finger)
+            ix = side_x - int(I_finger.x * side_x)
+            iy = int(I_finger.y * side_y)
+            iz = I_finger.z * side_x
             
-            pygame.draw.circle(screen,(0,255,0),(tx, ty), 10)
-            pygame.draw.circle(screen,(0,255,0),(ix, iy), 10)
-            pygame.draw.line(screen,(0,255,0),(ix,iy),(tx, ty), 3)
+            M_finger = landmarks.landmark[12]
+            #print(M_finger)
+            mx = side_x - int(M_finger.x * side_x)
+            my = int(M_finger.y * side_y)
+            mz = M_finger.z * side_x
+            
+            R_finger = landmarks.landmark[16]
+            #print(R_finger)
+            rx = side_x - int(R_finger.x * side_x)
+            ry = int(R_finger.y * side_y)
+            rz = R_finger.z * side_x
+            
+            P_finger = landmarks.landmark[20]
+            #print(P_finger)
+            px = side_x - int(P_finger.x * side_x)
+            py = int(P_finger.y * side_y)
+            pz = P_finger.z * side_x
+            
+            Wrist = landmarks.landmark[0]
+            #print(Wrist)
+            wx = side_x - int(Wrist.x * side_x)
+            wy = int(Wrist.y * side_y)
+            wz = Wrist.z * side_x
+            
+            shape = np.array((
+                [tx,ty],
+                [ix,iy],
+                [mx,my],
+                [rx,ry],
+                [px,py],
+                [wx,wy]
+            ))
+            
+            pygame.draw.polygon(screen,(0,255,0), shape, 3)
+            pygame.draw.line(screen,(0,0,B),(tx,ty),(ix,iy),3)
+            '''
+            #indexThumbDistance = math.sqrt((ix-tx)**2+(iy-ty)**2)
+            indexThumbDistance = math.sqrt(
+                        (landmarks.landmark[0].x*side_x-
+                        landmarks.landmark[8].x*side_x)**2+
+                        (landmarks.landmark[0].y*side_y-
+                         landmarks.landmark[8].y*side_y)**2
+                        )
+            #print(indexThumbDistance)
+            mScale = landmarks.landmark[9]
+            hand_scale = shape[5]+(side_x - mScale.x*side_x,mScale.y*side_y)
+            scale_points = indexThumbDistance/hand_scale
+            scale = math.sqrt((scale_points[0])**2+(scale_points[1])**2)*4
+            #print(scale)
+            s, x = config.scaling(scale)
+            s, x = int(s), int(x)
+            print(s,x)
+            '''
+            for point in shape:
+                pygame.draw.circle(screen, (R,G,B), point, 10)
+                
+
+            
         clock.tick(fps)
         pygame.display.flip()
         if running == False:

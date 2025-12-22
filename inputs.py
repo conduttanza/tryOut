@@ -4,9 +4,7 @@
 import cv2, pygame, time
 from threading import Thread, Lock
 from window_logic import Config
-
-
-
+config = Config()
 
 class Image:
     
@@ -15,8 +13,8 @@ class Image:
         self.cap = cv2.VideoCapture(self.stream_url or 0, cv2.CAP_DSHOW)  # 0 = default camera
         if not self.cap.isOpened():
             raise RuntimeError("Cannot use camera")
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, Config.side_x)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, Config.side_y)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.side_x)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.side_y)
         self.ret = False
         self.frame = None
         self.running = True
