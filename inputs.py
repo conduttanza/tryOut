@@ -96,4 +96,3 @@ class Image:
         self.running = False
         if hasattr(self, 'cap'):
             self.cap.release()
-

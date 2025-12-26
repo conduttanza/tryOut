@@ -16,7 +16,7 @@ side_x = config.side_x
 side_y = config.side_y
 image = inputs
 recognition = Hand_Recognition_RasPi
-recognizer = recognition.Hands_Reckon()
+recognizer = recognition.Gestures()
 
 def Point(input):
     coords = code.outPut(input)

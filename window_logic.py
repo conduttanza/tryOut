@@ -9,9 +9,9 @@ import pyautogui as pg
 import time
 
 class Config:
-    
+
     #universal values
-    stream_url = "http://192.168.1.3:8080/video"
+    stream_url = None #"http://192.168.1.3:8080/video"
     web_url = 'https://'
     threshold_value = 0.01   # threshold for change detection
     
@@ -28,12 +28,14 @@ class Config:
     handCommands = True
     doGimbalReader = True
     
+    
 
 class Logic(Config):
     def __init__(self):
         self.side_x = Config.side_x
         self.side_y = Config.side_y
         self.app = None
+        self.rememberLastText = None
             
     def scaling(self, scale):
         if self.side_x and self.side_y and scale and Config.doImageScaling == True:
@@ -54,8 +56,13 @@ class Logic(Config):
             print(url)
             wb.open(url, new=2)
             
-    def writeText(self):
-        print('cant write rn, ty for the patience')
+    def writeText(self, text):
+        if text == self.rememberLastText:
+            text = None
+        if text != None:
+            print(text)
+            self.rememberLastText = text
+            
     
     def gimbalReader(self, hand_lmks):
         if Config.doGimbalReader == True and hand_lmks != None:
